@@ -180,10 +180,6 @@
         <div class="step active" id="step1">
             <h2 style="text-align: center; color: #333; margin-bottom: 20px;">Quel type de contenu souhaitez-vous créer ?</h2>
             <div class="type-selector">
-                <div class="type-card" onclick="selectType('short')">
-                    <h3>📱 Short</h3>
-                    <p>Contenu vertical ultra-court</p>
-                </div>
                 <div class="type-card" onclick="selectType('sketch')">
                     <h3>😂 Sketch</h3>
                     <p>Courte scène humoristique</p>
@@ -203,6 +199,10 @@
                 <div class="type-card" onclick="selectType('film')">
                     <h3>🎥 Film</h3>
                     <p>Long métrage complet</p>
+                </div>
+                <div class="type-card" onclick="selectType('musique')">
+                    <h3>🎵 Musique</h3>
+                    <p>Paroles de chanson</p>
                 </div>
             </div>
         </div>
@@ -229,6 +229,16 @@
                         <option value="fantaisie">Fantaisie</option>
                         <option value="romance">Romance</option>
                         <option value="documentaire">Documentaire</option>
+                        <option value="pop">Pop</option>
+                        <option value="rock">Rock</option>
+                        <option value="rap">Rap/Hip-hop</option>
+                        <option value="rnb">R&B</option>
+                        <option value="electro">Électro</option>
+                        <option value="folk">Folk</option>
+                        <option value="jazz">Jazz</option>
+                        <option value="metal">Metal</option>
+                        <option value="reggae">Reggae</option>
+                        <option value="country">Country</option>
                     </select>
                 </div>
 
@@ -242,7 +252,7 @@
                     <textarea id="description" placeholder="Décrivez votre idée en quelques phrases..." required></textarea>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="numCharactersGroup">
                     <label for="numCharacters">Nombre de personnages principaux :</label>
                     <input type="number" id="numCharacters" min="1" max="10" value="3" required>
                 </div>
@@ -283,6 +293,15 @@
 
         function selectType(type) {
             selectedType = type;
+            // Masquer le champ nombre de personnages pour la musique
+            const numCharGroup = document.getElementById('numCharactersGroup');
+            if (type === 'musique') {
+                numCharGroup.style.display = 'none';
+                document.getElementById('numCharacters').required = false;
+            } else {
+                numCharGroup.style.display = 'block';
+                document.getElementById('numCharacters').required = true;
+            }
             goToStep(2);
         }
 
@@ -309,13 +328,18 @@
 
         function createConcept(type, title, genre, tone, description, numChars) {
             const typeNames = {
-                'short': 'SHORT',
                 'sketch': 'SKETCH',
                 'video': 'VIDÉO',
                 'court-metrage': 'COURT-MÉTRAGE',
                 'serie': 'SÉRIE',
-                'film': 'FILM'
+                'film': 'FILM',
+                'musique': 'MUSIQUE'
             };
+
+            // Si c'est une musique, générer des paroles
+            if (type === 'musique') {
+                return createSongLyrics(title, genre, tone, description);
+            }
 
             let concept = `═══════════════════════════════════════════════════════
     CONCEPT ${typeNames[type].toUpperCase()}
@@ -351,13 +375,6 @@ FORMAT : Long métrage
 DURÉE : 15-30 minutes
 FORMAT : Court-métrage artistique
 FESTIVALS : Cannes Court Métrage, Clermont-Ferrand, etc.
-
-`;
-            } else if (type === 'short') {
-                concept += `
-DURÉE : 15-60 secondes
-FORMAT : Contenu vertical (9:16)
-PLATEFORMES : TikTok, YouTube Shorts, Instagram Reels
 
 `;
             } else if (type === 'sketch') {
@@ -504,7 +521,7 @@ MUSIQUE ET SON :
 ═══════════════════════════════════════════════════════
 
 Public cible : ${genre === 'comédie' ? '16-35 ans' : '18-45 ans'}
-Plateformes : ${type === 'short' ? 'TikTok, YouTube Shorts, Instagram Reels' : type === 'sketch' ? 'YouTube, TikTok, Instagram' : type === 'serie' ? 'Netflix, Prime Video, plateformes de streaming' : 'Festivals, salles de cinéma, VOD'}
+Plateformes : ${type === 'sketch' ? 'YouTube, TikTok, Instagram' : type === 'serie' ? 'Netflix, Prime Video, plateformes de streaming' : 'Festivals, salles de cinéma, VOD'}
 
 ═══════════════════════════════════════════════════════
 
@@ -514,6 +531,315 @@ Prêt pour le développement et la production !
 ═══════════════════════════════════════════════════════`;
 
             return concept;
+        }
+
+        function createSongLyrics(title, genre, tone, description) {
+            let lyrics = `♫═══════════════════════════════════════════════════════♫
+                      PAROLES DE CHANSON
+♫═══════════════════════════════════════════════════════♫
+
+TITRE : ${title}
+GENRE : ${genre.charAt(0).toUpperCase() + genre.slice(1)}
+AMBIANCE : ${tone}
+THÈME : ${description}
+
+♫═══════════════════════════════════════════════════════♫
+                         STRUCTURE
+♫═══════════════════════════════════════════════════════♫
+
+Format : Couplet - Refrain - Couplet - Refrain - Pont - Refrain Final
+Durée estimée : 3-4 minutes
+Tempo : ${genre === 'rap' ? 'Rapide (90-110 BPM)' : genre === 'electro' ? 'Énergique (120-130 BPM)' : genre === 'folk' ? 'Modéré (80-100 BPM)' : 'Standard (100-120 BPM)'}
+
+
+♫═══════════════════════════════════════════════════════♫
+                    [INTRO INSTRUMENTALE]
+♫═══════════════════════════════════════════════════════♫
+
+${genre === 'rock' ? '[Guitare électrique - 8 mesures]' : 
+  genre === 'pop' ? '[Synthé et batterie - 8 mesures]' : 
+  genre === 'rap' ? '[Beat et sample - 4 mesures]' :
+  genre === 'folk' ? '[Guitare acoustique - 8 mesures]' :
+  genre === 'jazz' ? '[Piano et contrebasse - 8 mesures]' :
+  '[Instrumentation - 8 mesures]'}
+
+
+♫═══════════════════════════════════════════════════════♫
+                       [COUPLET 1]
+♫═══════════════════════════════════════════════════════♫
+
+${generateVerse(tone, genre, 1)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                     [PRÉ-REFRAIN]
+♫═══════════════════════════════════════════════════════♫
+
+${generatePreChorus(tone, genre)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                       [REFRAIN]
+♫═══════════════════════════════════════════════════════♫
+
+${generateChorus(title, tone, genre)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                       [COUPLET 2]
+♫═══════════════════════════════════════════════════════♫
+
+${generateVerse(tone, genre, 2)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                     [PRÉ-REFRAIN]
+♫═══════════════════════════════════════════════════════♫
+
+${generatePreChorus(tone, genre)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                       [REFRAIN]
+♫═══════════════════════════════════════════════════════♫
+
+${generateChorus(title, tone, genre)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                         [PONT]
+♫═══════════════════════════════════════════════════════♫
+
+${generateBridge(tone, genre)}
+
+
+♫═══════════════════════════════════════════════════════♫
+                    [REFRAIN FINAL]
+♫═══════════════════════════════════════════════════════♫
+
+${generateChorus(title, tone, genre)}
+
+${genre === 'pop' || genre === 'rnb' ? '\n(Répétition du refrain avec ad-libs)\n' + generateChorus(title, tone, genre) : ''}
+
+
+♫═══════════════════════════════════════════════════════♫
+                   [OUTRO INSTRUMENTALE]
+♫═══════════════════════════════════════════════════════♫
+
+${genre === 'rock' ? '[Fade out sur solo de guitare]' : 
+  genre === 'pop' ? '[Diminution progressive avec vocaux]' : 
+  genre === 'rap' ? '[Loop du beat en diminuant]' :
+  '[Fade out instrumental]'}
+
+
+♫═══════════════════════════════════════════════════════♫
+                    NOTES DE PRODUCTION
+♫═══════════════════════════════════════════════════════♫
+
+INSTRUMENTATION SUGGÉRÉE :
+${generateInstrumentation(genre)}
+
+ARRANGEMENT :
+• Introduction : Montée progressive de l'énergie
+• Couplets : Instrumentation plus légère pour mettre en avant les paroles
+• Refrains : Full instrumentation, mémorable et accrocheur
+• Pont : Changement de tonalité ou de rythme pour créer du contraste
+• Outro : Résolution satisfaisante
+
+VOIX :
+• Style vocal : ${genre === 'rap' ? 'Flow rythmé et percutant' : 
+                 genre === 'rnb' ? 'Mélismes et ornementations vocales' :
+                 genre === 'rock' ? 'Puissant et énergique' :
+                 genre === 'folk' ? 'Naturel et storytelling' :
+                 'Mélodieux et expressif'}
+• Harmonies : ${genre === 'rnb' || genre === 'pop' ? 'Riches harmonies vocales' : 
+               genre === 'rock' ? 'Chœurs sur refrains' :
+               'Soutien ponctuel'}
+
+PRODUCTION :
+• Mix : ${tone.includes('sombre') ? 'Reverb importante, sons plus graves' : 'Clair et dynamique'}
+• Mastering : ${genre === 'electro' || genre === 'rap' ? 'Basses prononcées' : 'Équilibré'}
+
+♫═══════════════════════════════════════════════════════♫
+                    PUBLIC CIBLE
+♫═══════════════════════════════════════════════════════♫
+
+Audience : ${genre === 'pop' ? 'Grand public, 13-35 ans' :
+            genre === 'rap' ? '15-30 ans, culture urbaine' :
+            genre === 'rock' ? '18-45 ans, amateurs de rock' :
+            genre === 'folk' ? '25-50 ans, mélomanes' :
+            genre === 'rnb' ? '18-40 ans, R&B/Soul lovers' :
+            '18-40 ans, passionnés du genre'}
+
+Plateformes : Spotify, Apple Music, YouTube, TikTok
+Radio : ${genre === 'pop' ? 'Format radio commercial' : 
+         genre === 'rap' ? 'Radios urbaines' :
+         genre === 'rock' ? 'Radios rock' :
+         'Radios spécialisées'}
+
+♫═══════════════════════════════════════════════════════♫
+
+Paroles créées le ${new Date().toLocaleDateString('fr-FR')}
+Prêt pour l'enregistrement en studio !
+
+© Tous droits réservés
+
+♫═══════════════════════════════════════════════════════♫`;
+
+            return lyrics;
+        }
+
+        function generateVerse(tone, genre, verseNum) {
+            if (genre === 'rap') {
+                return verseNum === 1 ? 
+`J'me lève le matin, nouvelle journée commence
+Les défis à relever, j'ai confiance en ma chance
+Pas le temps de douter, faut avancer sans relâche
+Chaque obstacle surmonté, c'est une nouvelle attache` :
+`Les moments difficiles forgent qui on devient
+Regarder vers demain, jamais vers hier matin
+On construit notre histoire, ligne après ligne
+Chaque rime, chaque mot, porte notre insigne`;
+            } else if (genre === 'folk') {
+                return verseNum === 1 ?
+`Sur les chemins de terre où le vent murmure
+Je marche doucement sous le ciel qui s'azure
+Les souvenirs dansent comme des feuilles d'automne
+Et mon cœur se rappelle ce que la vie nous donne` :
+`Les saisons ont tourné, les années ont filé
+Mais restent ces moments qu'on ne peut oublier
+Dans le creux de nos mains, la chaleur du présent
+Et l'espoir de demain qui résonne, puissant`;
+            } else {
+                return verseNum === 1 ?
+`Les lumières de la ville s'allument une à une
+Je pense à tous ces rêves, ces espoirs, ces fortunes
+Le temps passe si vite mais l'instant est précieux
+Chaque battement du cœur nous rapproche un peu mieux` :
+`Les épreuves traversées nous ont rendus plus forts
+On a appris à tomber pour se relever encore
+Et maintenant qu'on sait où notre place se trouve
+Rien ne peut nous arrêter, notre élan se renouve`;
+            }
+        }
+
+        function generatePreChorus(tone, genre) {
+            if (genre === 'rap') {
+                return `On garde la tête haute, les yeux vers l'horizon
+On trace notre route, on construit notre maison`;
+            } else if (genre === 'rock') {
+                return `Et je crie au monde entier (crie au monde)
+Que rien ne peut nous briser (jamais nous briser)`;
+            } else {
+                return `Et quand tout semble perdu
+On trouve en nous la force (on trouve la force)
+D'aller toujours plus haut`;
+            }
+        }
+
+        function generateChorus(title, tone, genre) {
+            if (genre === 'rap') {
+                return `${title}, c'est notre histoire à nous
+${title}, on la chante debout
+On avance ensemble, unis jusqu'au bout
+${title}, ouais c'est nous, c'est tout`;
+            } else if (genre === 'rock') {
+                return `${title} ! On ne lâche rien !
+${title} ! C'est notre destin !
+On va s'élever, toucher les étoiles
+${title}, on déploie nos ailes, on prend le large !`;
+            } else if (genre === 'folk') {
+                return `${title}, comme une mélodie
+Qui résonne dans nos vies
+${title}, doux et sincère
+Un refrain qui nous rassemble, qu'on préfère`;
+            } else {
+                return `${title}, c'est le moment de briller
+${title}, plus rien ne peut nous arrêter
+On s'envole vers demain, le cœur léger
+${title}, ensemble on va y arriver`;
+            }
+        }
+
+        function generateBridge(tone, genre) {
+            if (genre === 'rap') {
+                return `(Ralentissement du tempo)
+On a fait du chemin, on en fera encore
+Chaque pas qu'on fait, c'est un nouveau record
+Les doutes s'effacent quand on reste solidaires
+(Reprise du tempo)
+Et on repart de plus belle, vers la lumière !`;
+            } else if (genre === 'rock') {
+                return `[Solo de guitare - 8 mesures]
+
+Et même si le monde nous tourne le dos
+On restera debout, on sera les plus hauts !
+
+[Build-up vers refrain final]`;
+            } else {
+                return `Oh oh oh, oh oh oh
+Le futur nous appartient
+Oh oh oh, oh oh oh
+On tient le monde dans nos mains
+(Build-up instrumental)`;
+            }
+        }
+
+        function generateInstrumentation(genre) {
+            switch(genre) {
+                case 'pop':
+                    return `• Batterie électronique
+• Basse synthé
+• Piano/Synthés
+• Guitares (subtiles)
+• Percussions additionnelles`;
+                case 'rock':
+                    return `• Batterie acoustique (énergique)
+• Basse électrique
+• Guitare électrique lead
+• Guitare électrique rythmique
+• Éventuellement claviers`;
+                case 'rap':
+                    return `• Beat/Boîte à rythmes
+• 808 Bass
+• Samples
+• Hi-hats
+• Snares percutants`;
+                case 'rnb':
+                    return `• Batterie avec groove
+• Basse profonde
+• Piano électrique/Rhodes
+• Synthés pads
+• Percussions subtiles`;
+                case 'electro':
+                    return `• Kicks puissants
+• Synthés lead
+• Basse électronique
+• Pads atmosphériques
+• Effets sonores (FX)`;
+                case 'folk':
+                    return `• Guitare acoustique
+• Harmonica (optionnel)
+• Contrebasse ou basse acoustique
+• Percussions légères
+• Violon (optionnel)`;
+                case 'jazz':
+                    return `• Piano
+• Contrebasse
+• Batterie (balais)
+• Saxophone (optionnel)
+• Trompette (optionnel)`;
+                case 'metal':
+                    return `• Double grosse caisse
+• Basse heavy
+• Guitares distordues (drop tuning)
+• Guitare lead/solos
+• Éventuellement claviers`;
+                default:
+                    return `• Instrumentation standard du genre
+• Arrangement adapté au style
+• Production moderne`;
+            }
         }
 
         function downloadConcept() {
