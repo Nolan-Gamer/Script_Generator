@@ -361,8 +361,11 @@
 
         function goToStep(step) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step' + step).classList.add('active');
-            currentStep = step;
+            const stepElement = document.getElementById('step' + step);
+            if (stepElement) {
+                stepElement.classList.add('active');
+                currentStep = step;
+            }
         }
 
         function selectType(type) {
