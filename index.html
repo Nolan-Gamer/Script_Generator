@@ -204,9 +204,9 @@
                     <h3>🎵 Musique</h3>
                     <p>Paroles de chanson</p>
                 </div>
-                <div class="type-card" onclick="selectType('analyse-midi')">
-                    <h3>🎹 Analyser MIDI</h3>
-                    <p>Analyser un fichier MIDI</p>
+                <div class="type-card" onclick="selectType('midi')">
+                    <h3>🎹 Générateur MIDI</h3>
+                    <p>Fichier MIDI instrumental</p>
                 </div>
             </div>
         </div>
@@ -282,18 +282,56 @@
             <button class="btn btn-secondary" onclick="goToStep(2)">Retour</button>
         </div>
 
-        <!-- Étape analyse MIDI -->
-        <div class="step" id="stepMidiAnalyze">
-            <h2 style="color: #333; margin-bottom: 20px;">🎹 Analyser un fichier MIDI</h2>
-            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; text-align: center;">
-                <p style="margin-bottom: 20px; color: #666;">Uploadez un fichier MIDI pour analyser ses instruments</p>
-                <input type="file" id="midiFileInput" accept=".mid,.midi" style="display: none;" onchange="analyzeMidiFile(event)">
-                <button class="btn" onclick="document.getElementById('midiFileInput').click()">
-                    📁 Choisir un fichier MIDI
-                </button>
+        <!-- Étape 2c: Upload WAV pour MIDI -->
+        <div class="step" id="step2c">
+            <h2 style="color: #333; margin-bottom: 20px;">🎹 Générateur MIDI</h2>
+            
+            <div class="form-group">
+                <label for="wavFile">Fichier audio vocal (WAV) :</label>
+                <input type="file" id="wavFile" accept=".wav,audio/wav" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                <small style="color: #666;">Uploadez un fichier WAV contenant uniquement la voix (a cappella)</small>
             </div>
-            <div id="midiAnalysisResult" style="display: none; margin-top: 20px;"></div>
-            <button class="btn btn-secondary" onclick="goToStep(1)" style="margin-top: 20px;">Retour</button>
+
+            <div class="form-group">
+                <label for="midiTempo">Tempo désiré (BPM) :</label>
+                <input type="number" id="midiTempo" min="60" max="200" value="120" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                <small style="color: #666;">Lent: 60-90 | Modéré: 90-120 | Rapide: 120-180</small>
+            </div>
+
+            <div class="form-group">
+                <label for="midiGenre">Style d'instrumentation :</label>
+                <select id="midiGenre" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="pop">Pop - Piano, Synthés, Batterie</option>
+                    <option value="rock">Rock - Guitares, Basse, Batterie</option>
+                    <option value="electronic">Electronic - Synthés, Basse 808, Pads</option>
+                    <option value="jazz">Jazz - Piano, Contrebasse, Batterie douce</option>
+                    <option value="orchestral">Orchestral - Cordes, Cuivres, Timbales</option>
+                    <option value="ambient">Ambient - Pads atmosphériques, Textures</option>
+                    <option value="funk">Funk - Basse groovy, Guitare wah, Cuivres</option>
+                    <option value="minimal">Minimal - Instrumentation épurée</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="midiKey">Tonalité :</label>
+                <select id="midiKey" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="C">Do Majeur (C)</option>
+                    <option value="Cm">Do mineur (Cm)</option>
+                    <option value="G">Sol Majeur (G)</option>
+                    <option value="Gm">Sol mineur (Gm)</option>
+                    <option value="D">Ré Majeur (D)</option>
+                    <option value="Dm">Ré mineur (Dm)</option>
+                    <option value="A">La Majeur (A)</option>
+                    <option value="Am">La mineur (Am)</option>
+                    <option value="E">Mi Majeur (E)</option>
+                    <option value="Em">Mi mineur (Em)</option>
+                    <option value="F">Fa Majeur (F)</option>
+                    <option value="Fm">Fa mineur (Fm)</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="generateMIDI()">Générer le fichier MIDI 🎹</button>
+            <button class="btn btn-secondary" onclick="goToStep(1)">Retour</button>
         </div>
 
         <!-- Étape 3: Génération -->
@@ -309,21 +347,8 @@
         <div class="step" id="step4">
             <h2 style="color: #333; margin-bottom: 20px;">Votre concept est prêt !</h2>
             <div class="result" id="result"></div>
-            <button class="btn btn-download" onclick="downloadConcept()">
-                <span id="downloadBtnText">Télécharger le fichier TXT 📥</span>
-            </button>
+            <button class="btn btn-download" onclick="downloadConcept()">Télécharger le fichier TXT 📥</button>
             <button class="btn btn-secondary" onclick="restart()">Nouveau concept</button>
-            
-            <div id="conversionInfo" style="display: none; margin-top: 20px; padding: 20px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196f3;">
-                <h3 style="color: #1976d2; margin-bottom: 10px;">🎵 Convertir votre MIDI en WAV</h3>
-                <p style="color: #555; margin-bottom: 10px;">Pour obtenir des fichiers audio WAV à partir de votre fichier MIDI, utilisez l'un de ces outils gratuits :</p>
-                <ul style="color: #555; margin-left: 20px;">
-                    <li><strong>En ligne :</strong> <a href="https://www.converseen.com/midi-to-wav/" target="_blank" style="color: #1976d2;">Converseen MIDI to WAV</a></li>
-                    <li><strong>Logiciel :</strong> TiMidity++ (gratuit, multiplateforme)</li>
-                    <li><strong>Logiciel :</strong> FluidSynth (gratuit, haute qualité)</li>
-                    <li><strong>DAW :</strong> Importez dans Reaper, Audacity, GarageBand, etc.</li>
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -333,7 +358,6 @@
         let generatedConcept = '';
         let artistsData = [];
         let projectData = {};
-        let generatedMidiData = null;
 
         function goToStep(step) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -343,12 +367,6 @@
 
         function selectType(type) {
             selectedType = type;
-            
-            if (type === 'analyse-midi') {
-                goToStep('MidiAnalyze');
-                return;
-            }
-            
             const numCharGroup = document.getElementById('numCharactersGroup');
             const numCharLabel = document.getElementById('numCharactersLabel');
             const tempoGroup = document.getElementById('tempoGroup');
@@ -361,6 +379,10 @@
                 document.getElementById('numCharacters').required = true;
                 document.getElementById('numCharacters').value = 1;
                 submitBtnText.textContent = 'Continuer 🎵';
+            } else if (type === 'midi') {
+                // Aller directement à la page MIDI
+                goToStep('2c');
+                return;
             } else {
                 numCharGroup.style.display = 'block';
                 numCharLabel.textContent = 'Nombre de personnages principaux :';
@@ -522,14 +544,8 @@
             setTimeout(() => {
                 if (selectedType === 'musique') {
                     generatedConcept = createSongLyrics(title, genre, tone, description, tempo, artistsData);
-                    generatedMidiData = generateMidiFile(title, genre, tempo, artistsData);
-                    document.getElementById('downloadBtnText').textContent = 'Télécharger TXT + MIDI 📥';
-                    document.getElementById('conversionInfo').style.display = 'block';
                 } else {
                     generatedConcept = createConcept(selectedType, title, genre, tone, description, numCharacters);
-                    generatedMidiData = null;
-                    document.getElementById('downloadBtnText').textContent = 'Télécharger le fichier TXT 📥';
-                    document.getElementById('conversionInfo').style.display = 'none';
                 }
                 document.getElementById('result').textContent = generatedConcept;
                 goToStep(4);
@@ -1163,7 +1179,6 @@ On tient le monde dans nos mains
         }
 
         function downloadConcept() {
-            // Télécharger le fichier TXT
             const blob = new Blob([generatedConcept], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1173,21 +1188,6 @@ On tient le monde dans nos mains
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
-            
-            // Si c'est une musique, télécharger aussi le MIDI
-            if (selectedType === 'musique' && generatedMidiData) {
-                setTimeout(() => {
-                    const midiBlob = new Blob([generatedMidiData], { type: 'audio/midi' });
-                    const midiUrl = window.URL.createObjectURL(midiBlob);
-                    const midiLink = document.createElement('a');
-                    midiLink.href = midiUrl;
-                    midiLink.download = `music_${Date.now()}.mid`;
-                    document.body.appendChild(midiLink);
-                    midiLink.click();
-                    document.body.removeChild(midiLink);
-                    window.URL.revokeObjectURL(midiUrl);
-                }, 500);
-            }
         }
 
         function restart() {
@@ -1196,349 +1196,7 @@ On tient le monde dans nos mains
             generatedConcept = '';
             artistsData = [];
             projectData = {};
-            generatedMidiData = null;
             goToStep(1);
-        }
-
-        // ===== FONCTIONS MIDI =====
-        
-        function generateMidiFile(title, genre, tempo, artists) {
-            // Créer un fichier MIDI basique
-            const header = createMidiHeader(tempo);
-            const tracks = createMidiTracks(genre, tempo, artists);
-            
-            return new Uint8Array([...header, ...tracks]);
-        }
-
-        function createMidiHeader(tempo) {
-            // Header MIDI: MThd + longueur + format + nombre de pistes + division
-            const header = [
-                0x4D, 0x54, 0x68, 0x64, // "MThd"
-                0x00, 0x00, 0x00, 0x06, // Longueur de l'en-tête (6 bytes)
-                0x00, 0x01,             // Format 1 (plusieurs pistes synchronisées)
-                0x00, 0x02,             // 2 pistes (tempo + mélodie)
-                0x00, 0x60              // Division temporelle (96 ticks par noire)
-            ];
-            
-            return header;
-        }
-
-        function createMidiTracks(genre, tempo, artists) {
-            const tracks = [];
-            
-            // Piste 0: Tempo et métadonnées
-            const tempoTrack = createTempoTrack(tempo);
-            tracks.push(...tempoTrack);
-            
-            // Piste 1: Mélodie principale
-            const melodyTrack = createMelodyTrack(genre, artists);
-            tracks.push(...melodyTrack);
-            
-            return tracks;
-        }
-
-        function createTempoTrack(tempo) {
-            const bpm = parseInt(tempo);
-            const microsecondsPerQuarter = Math.floor(60000000 / bpm);
-            
-            const track = [
-                0x4D, 0x54, 0x72, 0x6B, // "MTrk"
-            ];
-            
-            const events = [
-                0x00, 0xFF, 0x51, 0x03, // Tempo meta event
-                (microsecondsPerQuarter >> 16) & 0xFF,
-                (microsecondsPerQuarter >> 8) & 0xFF,
-                microsecondsPerQuarter & 0xFF,
-                0x00, 0xFF, 0x2F, 0x00  // Fin de piste
-            ];
-            
-            const length = events.length;
-            track.push(
-                (length >> 24) & 0xFF,
-                (length >> 16) & 0xFF,
-                (length >> 8) & 0xFF,
-                length & 0xFF
-            );
-            track.push(...events);
-            
-            return track;
-        }
-
-        function createMelodyTrack(genre, artists) {
-            const track = [
-                0x4D, 0x54, 0x72, 0x6B, // "MTrk"
-            ];
-            
-            // Déterminer l'instrument principal
-            let instrument = 0; // Piano par défaut
-            const firstArtist = artists[0];
-            
-            if (firstArtist) {
-                const instrumentMap = {
-                    'Guitare': 24,
-                    'Basse': 32,
-                    'Piano/Clavier': 0,
-                    'Synthétiseur': 80,
-                    'Saxophone': 64,
-                    'Trompette': 56,
-                    'Violon': 40,
-                    'Batterie': 0
-                };
-                instrument = instrumentMap[firstArtist.role] || 0;
-            }
-            
-            const events = [];
-            
-            // Program change (sélection d'instrument)
-            events.push(0x00, 0xC0, instrument);
-            
-            // Générer une mélodie simple basée sur le genre
-            const melody = generateMelodyNotes(genre);
-            let time = 0;
-            
-            melody.forEach((note, index) => {
-                // Note On
-                events.push(
-                    time > 0 ? 0x60 : 0x00, // Delta time (96 ticks = 1 noire)
-                    0x90,                    // Note On, canal 0
-                    note,                    // Numéro de note
-                    0x64                     // Vélocité (100)
-                );
-                time = 0x60;
-                
-                // Note Off
-                events.push(
-                    0x60,  // Durée de la note (96 ticks)
-                    0x80,  // Note Off, canal 0
-                    note,
-                    0x00
-                );
-            });
-            
-            // Fin de piste
-            events.push(0x00, 0xFF, 0x2F, 0x00);
-            
-            const length = events.length;
-            track.push(
-                (length >> 24) & 0xFF,
-                (length >> 16) & 0xFF,
-                (length >> 8) & 0xFF,
-                length & 0xFF
-            );
-            track.push(...events);
-            
-            return track;
-        }
-
-        function generateMelodyNotes(genre) {
-            // Génère une séquence de notes selon le genre
-            const scales = {
-                'pop': [60, 62, 64, 65, 67, 69, 71, 72], // Do majeur
-                'rock': [60, 62, 63, 65, 67, 68, 70, 72], // Do mineur
-                'rap': [60, 63, 65, 67, 70], // Pentatonique
-                'jazz': [60, 62, 64, 66, 67, 69, 71, 72], // Do majeur 7
-                'folk': [60, 62, 64, 65, 67, 69, 71, 72],
-                'electro': [60, 62, 64, 67, 69],
-                'metal': [60, 62, 63, 65, 67, 68, 70],
-                'rnb': [60, 62, 64, 65, 67, 69, 71, 72]
-            };
-            
-            const scale = scales[genre] || scales['pop'];
-            const melody = [];
-            
-            // Pattern simple: 16 notes
-            const pattern = [0, 2, 4, 2, 0, 2, 4, 5, 4, 2, 0, 7, 5, 4, 2, 0];
-            
-            pattern.forEach(index => {
-                melody.push(scale[index % scale.length]);
-            });
-            
-            return melody;
-        }
-
-        // Analyse de fichier MIDI uploadé
-        async function analyzeMidiFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const arrayBuffer = await file.arrayBuffer();
-            const midiData = new Uint8Array(arrayBuffer);
-            
-            const analysis = parseMidiFile(midiData);
-            displayMidiAnalysis(analysis, file.name);
-        }
-
-        function parseMidiFile(data) {
-            const analysis = {
-                format: 0,
-                tracks: 0,
-                division: 0,
-                instruments: [],
-                tempo: 120,
-                totalNotes: 0
-            };
-            
-            // Vérifier l'en-tête MIDI
-            if (data[0] !== 0x4D || data[1] !== 0x54 || data[2] !== 0x68 || data[3] !== 0x64) {
-                throw new Error('Fichier MIDI invalide');
-            }
-            
-            // Lire le header
-            analysis.format = (data[8] << 8) | data[9];
-            analysis.tracks = (data[10] << 8) | data[11];
-            analysis.division = (data[12] << 8) | data[13];
-            
-            let position = 14; // Après le header
-            
-            // Parser les pistes
-            for (let i = 0; i < analysis.tracks && position < data.length; i++) {
-                if (data[position] === 0x4D && data[position + 1] === 0x54 && 
-                    data[position + 2] === 0x72 && data[position + 3] === 0x6B) {
-                    
-                    position += 4; // "MTrk"
-                    const trackLength = (data[position] << 24) | (data[position + 1] << 16) | 
-                                      (data[position + 2] << 8) | data[position + 3];
-                    position += 4;
-                    
-                    const trackEnd = position + trackLength;
-                    
-                    // Parser les événements de la piste
-                    while (position < trackEnd && position < data.length) {
-                        // Lire le delta time
-                        let deltaTime = 0;
-                        let byte;
-                        do {
-                            byte = data[position++];
-                            deltaTime = (deltaTime << 7) | (byte & 0x7F);
-                        } while (byte & 0x80);
-                        
-                        const eventType = data[position++];
-                        
-                        // Program Change (changement d'instrument)
-                        if ((eventType & 0xF0) === 0xC0) {
-                            const instrument = data[position++];
-                            const instrumentName = getInstrumentName(instrument);
-                            if (!analysis.instruments.includes(instrumentName)) {
-                                analysis.instruments.push(instrumentName);
-                            }
-                        }
-                        // Note On
-                        else if ((eventType & 0xF0) === 0x90) {
-                            position += 2; // note + velocity
-                            analysis.totalNotes++;
-                        }
-                        // Note Off
-                        else if ((eventType & 0xF0) === 0x80) {
-                            position += 2;
-                        }
-                        // Meta event
-                        else if (eventType === 0xFF) {
-                            const metaType = data[position++];
-                            const length = data[position++];
-                            
-                            // Tempo
-                            if (metaType === 0x51 && length === 3) {
-                                const microsecondsPerQuarter = (data[position] << 16) | 
-                                                             (data[position + 1] << 8) | 
-                                                             data[position + 2];
-                                analysis.tempo = Math.round(60000000 / microsecondsPerQuarter);
-                            }
-                            
-                            position += length;
-                        }
-                        // Autres événements
-                        else {
-                            position++; // Skip
-                        }
-                    }
-                    
-                    position = trackEnd;
-                }
-            }
-            
-            return analysis;
-        }
-
-        function getInstrumentName(program) {
-            const instruments = [
-                "Piano acoustique", "Piano brillant", "Piano électrique", "Piano honky-tonk",
-                "Piano électrique 1", "Piano électrique 2", "Clavecin", "Clavinet",
-                "Célesta", "Glockenspiel", "Boîte à musique", "Vibraphone",
-                "Marimba", "Xylophone", "Cloches tubulaires", "Dulcimer",
-                "Orgue Hammond", "Orgue à percussion", "Orgue rock", "Orgue d'église",
-                "Orgue à anches", "Accordéon", "Harmonica", "Bandonéon",
-                "Guitare acoustique (nylon)", "Guitare acoustique (acier)", "Guitare électrique (jazz)", "Guitare électrique (clean)",
-                "Guitare électrique (muted)", "Guitare overdrive", "Guitare distorsion", "Guitare harmoniques",
-                "Basse acoustique", "Basse électrique (finger)", "Basse électrique (pick)", "Basse fretless",
-                "Basse slap 1", "Basse slap 2", "Basse synthé 1", "Basse synthé 2",
-                "Violon", "Alto", "Violoncelle", "Contrebasse",
-                "Cordes tremolo", "Cordes pizzicato", "Harpe orchestrale", "Timbales",
-                "Cordes ensemble 1", "Cordes ensemble 2", "Cordes synthé 1", "Cordes synthé 2",
-                "Chœur aahs", "Voix oohs", "Voix synthé", "Orchestre hit",
-                "Trompette", "Trombone", "Tuba", "Trompette sourdine",
-                "Cor français", "Section de cuivres", "Cuivres synthé 1", "Cuivres synthé 2",
-                "Saxophone soprano", "Saxophone alto", "Saxophone ténor", "Saxophone baryton",
-                "Hautbois", "Cor anglais", "Basson", "Clarinette",
-                "Piccolo", "Flûte", "Flûte à bec", "Flûte de pan",
-                "Bouteille soufflée", "Shakuhachi", "Sifflet", "Ocarina",
-                "Lead 1 (carré)", "Lead 2 (dents de scie)", "Lead 3 (calliope)", "Lead 4 (chiff)",
-                "Lead 5 (charang)", "Lead 6 (voix)", "Lead 7 (quintes)", "Lead 8 (basse + lead)",
-                "Pad 1 (nouveau)", "Pad 2 (chaud)", "Pad 3 (polysynth)", "Pad 4 (chœur)",
-                "Pad 5 (bowed)", "Pad 6 (métallique)", "Pad 7 (halo)", "Pad 8 (sweep)",
-                "FX 1 (pluie)", "FX 2 (soundtrack)", "FX 3 (cristal)", "FX 4 (atmosphère)",
-                "FX 5 (brillance)", "FX 6 (goblins)", "FX 7 (échos)", "FX 8 (sci-fi)",
-                "Sitar", "Banjo", "Shamisen", "Koto",
-                "Kalimba", "Cornemuse", "Violon", "Shanai",
-                "Tinkle bell", "Agogo", "Steel drums", "Woodblock",
-                "Taiko drum", "Tom mélodique", "Synthé drum", "Cymbale inversée",
-                "Guitare fret noise", "Souffle", "Bord de mer", "Oiseau tweet",
-                "Téléphone", "Hélicoptère", "Applaudissements", "Coup de feu"
-            ];
-            
-            return instruments[program] || `Instrument ${program}`;
-        }
-
-        function displayMidiAnalysis(analysis, filename) {
-            const resultDiv = document.getElementById('midiAnalysisResult');
-            resultDiv.style.display = 'block';
-            
-            let html = `
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">📊 Analyse du fichier : ${filename}</h3>
-                    
-                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h4 style="color: #333; margin-bottom: 10px;">Informations générales</h4>
-                        <p><strong>Format MIDI :</strong> ${analysis.format}</p>
-                        <p><strong>Nombre de pistes :</strong> ${analysis.tracks}</p>
-                        <p><strong>Tempo :</strong> ${analysis.tempo} BPM</p>
-                        <p><strong>Total de notes :</strong> ${analysis.totalNotes}</p>
-                    </div>
-                    
-                    <div style="background: white; padding: 15px; border-radius: 8px;">
-                        <h4 style="color: #333; margin-bottom: 10px;">🎸 Instruments détectés (${analysis.instruments.length})</h4>
-                        ${analysis.instruments.length > 0 ? 
-                            '<ul style="margin-left: 20px; color: #555;">' + 
-                            analysis.instruments.map(inst => `<li>${inst}</li>`).join('') + 
-                            '</ul>' : 
-                            '<p style="color: #999;">Aucun instrument spécifique détecté</p>'
-                        }
-                    </div>
-                    
-                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #2196f3;">
-                        <h4 style="color: #1976d2; margin-bottom: 10px;">💡 Pour convertir en WAV</h4>
-                        <p style="color: #555;">Utilisez ces outils pour obtenir des fichiers audio :</p>
-                        <ul style="margin-left: 20px; color: #555; margin-top: 10px;">
-                            <li><strong>TiMidity++ :</strong> Logiciel gratuit multiplateforme</li>
-                            <li><strong>FluidSynth :</strong> Haute qualité avec soundfonts</li>
-                            <li><strong>Audacity :</strong> Importez le MIDI et exportez en WAV</li>
-                            <li><strong>En ligne :</strong> <a href="https://www.converseen.com/midi-to-wav/" target="_blank" style="color: #1976d2;">Converseen</a></li>
-                        </ul>
-                    </div>
-                </div>
-            `;
-            
-            resultDiv.innerHTML = html;
         }
     </script>
 </body>
