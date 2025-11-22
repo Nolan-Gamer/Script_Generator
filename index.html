@@ -332,6 +332,11 @@
 
             <button class="btn" onclick="generateMIDI()">Générer le fichier MIDI 🎹</button>
             <button class="btn btn-secondary" onclick="goToStep(1)">Retour</button>
+            
+            <div id="midiDebug" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; display: none;">
+                <h4 style="color: #667eea;">Debug Info:</h4>
+                <pre id="debugOutput" style="font-size: 12px; overflow-x: auto;"></pre>
+            </div>
         </div>
 
         <!-- Étape 3: Génération -->
